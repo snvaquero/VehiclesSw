@@ -54,7 +54,7 @@ namespace VehiclesSw.API.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,Price")] Procedure procedure)
+        public async Task<IActionResult> Create(Procedure procedure)
         {
             if (ModelState.IsValid)
             {
@@ -81,12 +81,12 @@ namespace VehiclesSw.API.Controllers
             return View(procedure);
         }
 
-        // POST: Procedures/Edit/5
+        // POST: Brand/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Description,Price")] Procedure procedure)
+        public async Task<IActionResult> Edit(int id, Procedure procedure)
         {
             if (id != procedure.Id)
             {
@@ -99,24 +99,34 @@ namespace VehiclesSw.API.Controllers
                 {
                     _context.Update(procedure);
                     await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException dbUpdateException)
                 {
-                    if (!ProcedureExists(procedure.Id))
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
                     {
-                        return NotFound();
+                        ModelState.AddModelError(string.Empty, "Ya existe este tipo de Marca.");
                     }
                     else
                     {
-                        throw;
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                }
+
+
+
             }
+
+
+
             return View(procedure);
         }
-
-        // GET: Procedures/Delete/5
+        // GET: VehicleTypes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,30 +134,16 @@ namespace VehiclesSw.API.Controllers
                 return NotFound();
             }
 
-            var procedure = await _context.procedures
+            Procedure procedure = await _context.procedures
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (procedure == null)
             {
                 return NotFound();
             }
 
-            return View(procedure);
-        }
-
-        // POST: Procedures/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var procedure = await _context.procedures.FindAsync(id);
             _context.procedures.Remove(procedure);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProcedureExists(int id)
-        {
-            return _context.procedures.Any(e => e.Id == id);
         }
     }
 }
