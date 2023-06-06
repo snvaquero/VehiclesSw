@@ -73,7 +73,7 @@ namespace VehiclesSw.API.Controllers
                 return NotFound();
             }
 
-            var documentType = await _context.documentTypes.FindAsync(id);
+            DocumentType documentType = await _context.documentTypes.FindAsync(id);
             if (documentType == null)
             {
                 return NotFound();
@@ -86,9 +86,9 @@ namespace VehiclesSw.API.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, VehicleType vehicle)
+        public async Task<IActionResult> Edit(int id, DocumentType documentType)
         {
-            if (id != vehicle.Id)
+            if (id != documentType.Id)
             {
                 return NotFound();
             }
@@ -97,7 +97,7 @@ namespace VehiclesSw.API.Controllers
             {
                 try
                 {
-                    _context.Update(vehicle);
+                    _context.Update(documentType);
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction(nameof(Index));
@@ -124,7 +124,7 @@ namespace VehiclesSw.API.Controllers
 
 
 
-            return View(vehicle);
+            return View(documentType);
         }
         // GET: VehicleTypes/Delete/5
         public async Task<IActionResult> Delete(int? id)
