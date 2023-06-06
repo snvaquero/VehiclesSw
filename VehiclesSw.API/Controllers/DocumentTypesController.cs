@@ -1,74 +1,71 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using VehiclesSw.API.Data;
 using VehiclesSw.API.Data.Entities;
 
 namespace VehiclesSw.API.Controllers
 {
-    public class VehicleTypesController : Controller
+    public class DocumentTypesController : Controller
     {
         private readonly DataContext _context;
 
-        public VehicleTypesController(DataContext context)
+        public DocumentTypesController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: VehicleTypes
+        // GET: DocumentTypes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.vehicleTypes.ToListAsync());
+            return View(await _context.documentTypes.ToListAsync());
         }
 
+        // GET: DocumentTypes/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
+            var documentType = await _context.documentTypes
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (documentType == null)
+            {
+                return NotFound();
+            }
 
-        // GET: VehicleTypes/Create
+            return View(documentType);
+        }
+
+        // GET: DocumentTypes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: VehicleTypes/Create
+        // POST: DocumentTypes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VehicleType vehicleType)
+        public async Task<IActionResult> Create([Bind("Id,Description")] DocumentType documentType)
         {
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Add(vehicleType);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe este tipo de Vehiculo.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-
-
-
+                _context.Add(documentType);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            return View(vehicleType);
+            return View(documentType);
         }
 
-        // GET: VehicleTypes/Edit/5
+        // GET: DocumentTypes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,22 +73,22 @@ namespace VehiclesSw.API.Controllers
                 return NotFound();
             }
 
-            VehicleType vehicleType = await _context.vehicleTypes.FindAsync(id);
-            if (vehicleType == null)
+            var documentType = await _context.documentTypes.FindAsync(id);
+            if (documentType == null)
             {
                 return NotFound();
             }
-            return View(vehicleType);
+            return View(documentType);
         }
 
-        // POST: VehicleTypes/Edit/5
+        // POST: Brand/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, VehicleType vehicleType)
+        public async Task<IActionResult> Edit(int id, VehicleType vehicle)
         {
-            if (id != vehicleType.Id)
+            if (id != vehicle.Id)
             {
                 return NotFound();
             }
@@ -100,7 +97,7 @@ namespace VehiclesSw.API.Controllers
             {
                 try
                 {
-                    _context.Update(vehicleType);
+                    _context.Update(vehicle);
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction(nameof(Index));
@@ -109,7 +106,7 @@ namespace VehiclesSw.API.Controllers
                 {
                     if (dbUpdateException.InnerException.Message.Contains("duplicate"))
                     {
-                        ModelState.AddModelError(string.Empty, "Ya existe este tipo de Vehiculo.");
+                        ModelState.AddModelError(string.Empty, "Ya existe este tipo de Marca.");
                     }
                     else
                     {
@@ -127,9 +124,8 @@ namespace VehiclesSw.API.Controllers
 
 
 
-            return View(vehicleType);
+            return View(vehicle);
         }
-
         // GET: VehicleTypes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -149,7 +145,5 @@ namespace VehiclesSw.API.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-
     }
 }

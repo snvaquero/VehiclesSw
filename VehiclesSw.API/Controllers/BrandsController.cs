@@ -1,74 +1,71 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using VehiclesSw.API.Data;
 using VehiclesSw.API.Data.Entities;
 
 namespace VehiclesSw.API.Controllers
 {
-    public class VehicleTypesController : Controller
+    public class BrandsController : Controller
     {
         private readonly DataContext _context;
 
-        public VehicleTypesController(DataContext context)
+        public BrandsController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: VehicleTypes
+        // GET: Brands
         public async Task<IActionResult> Index()
         {
-            return View(await _context.vehicleTypes.ToListAsync());
+            return View(await _context.brands.ToListAsync());
         }
 
+        // GET: Brands/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
+            var brand = await _context.brands
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (brand == null)
+            {
+                return NotFound();
+            }
 
-        // GET: VehicleTypes/Create
+            return View(brand);
+        }
+
+        // GET: Brands/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: VehicleTypes/Create
+        // POST: Brands/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VehicleType vehicleType)
+        public async Task<IActionResult> Create( Brand brand)
         {
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Add(vehicleType);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException dbUpdateException)
-                {
-                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
-                    {
-                        ModelState.AddModelError(string.Empty, "Ya existe este tipo de Vehiculo.");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
-                    }
-                }
-                catch (Exception exception)
-                {
-                    ModelState.AddModelError(string.Empty, exception.Message);
-                }
-
-
-
+                _context.Add(brand);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            return View(vehicleType);
+            return View(brand);
         }
 
-        // GET: VehicleTypes/Edit/5
+        // GET: Brand/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -76,22 +73,22 @@ namespace VehiclesSw.API.Controllers
                 return NotFound();
             }
 
-            VehicleType vehicleType = await _context.vehicleTypes.FindAsync(id);
-            if (vehicleType == null)
+            Brand brand = await _context.brands.FindAsync(id);
+            if (brand == null)
             {
                 return NotFound();
             }
-            return View(vehicleType);
+            return View(brand);
         }
 
-        // POST: VehicleTypes/Edit/5
+        // POST: Brand/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, VehicleType vehicleType)
+        public async Task<IActionResult> Edit(int id, Brand brand)
         {
-            if (id != vehicleType.Id)
+            if (id != brand.Id)
             {
                 return NotFound();
             }
@@ -100,7 +97,7 @@ namespace VehiclesSw.API.Controllers
             {
                 try
                 {
-                    _context.Update(vehicleType);
+                    _context.Update(brand);
                     await _context.SaveChangesAsync();
 
                     return RedirectToAction(nameof(Index));
@@ -109,7 +106,7 @@ namespace VehiclesSw.API.Controllers
                 {
                     if (dbUpdateException.InnerException.Message.Contains("duplicate"))
                     {
-                        ModelState.AddModelError(string.Empty, "Ya existe este tipo de Vehiculo.");
+                        ModelState.AddModelError(string.Empty, "Ya existe este tipo de Marca.");
                     }
                     else
                     {
@@ -127,9 +124,8 @@ namespace VehiclesSw.API.Controllers
 
 
 
-            return View(vehicleType);
+            return View(brand);
         }
-
         // GET: VehicleTypes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -138,18 +134,16 @@ namespace VehiclesSw.API.Controllers
                 return NotFound();
             }
 
-            DocumentType documentType = await _context.documentTypes
+            Brand brand = await _context.brands
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (documentType == null)
+            if (brand == null)
             {
                 return NotFound();
             }
 
-            _context.documentTypes.Remove(documentType);
+            _context.brands.Remove(brand);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-
     }
 }
